@@ -12,6 +12,10 @@ class Checkout {
 
   type Price = Int
 
+  val pricePerOrange:Price = 25
+
+  val pricePerApple:Price = 60
+
   /**
     * Turn an input list of strings into either an ErrorString or a Price
     */
@@ -36,13 +40,26 @@ class Checkout {
       stringToFruit(s).flatMap(f ⇒ acc.map(f :: _))
     )
 
+  /** ThreeForTwo offer for oranges */
+  private[capgemini] def orangeOffer(oranges: List[Orange.type]) : Price =
+    (oranges.size / 3 * 2 + oranges.size % 3) * pricePerOrange
+
+  /** Buy one get one free apple offer */
+  private[capgemini] def appleOffer(apples: List[Apple.type]) : Price =
+    Math.ceil(apples.size / 2.0).toInt * pricePerApple
+
   /**
     * Given a list of fruits calculate the price
     */
-  private[capgemini] def calculate(input:List[Fruit]) : Price = input.foldLeft(0)((acc,f) ⇒ f match {
-    case Apple ⇒ acc + 60
-    case Orange ⇒ acc + 25
-  })
+  private[capgemini] def calculate(input:List[Fruit]) : Price = {
+    val (oranges, apples) = input.foldLeft((List.empty[Orange.type],List.empty[Apple.type]))((acc, f) ⇒
+     f match {
+       case Orange ⇒ (Orange :: acc._1) → acc._2
+       case Apple  ⇒ acc._1 → (Apple :: acc._2)
+     }
+    )
+    orangeOffer(oranges) + appleOffer(apples)
+  }
 
 }
 

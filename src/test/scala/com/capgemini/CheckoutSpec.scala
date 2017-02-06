@@ -30,11 +30,11 @@ class CheckoutSpec extends WordSpec with Matchers with PropertyChecks{
   }
 
   "The checkout system can add up fruits correctly" in {
-    checkout.calculate(List(Apple,Apple,Apple)) shouldEqual 180
+    checkout.calculate(List(Apple,Apple,Apple)) shouldEqual 120
 
     checkout.calculate(List(Orange,Apple,Orange)) shouldEqual 110
 
-    checkout.calculate(List(Orange,Orange,Orange)) shouldEqual 75
+    checkout.calculate(List(Orange,Orange,Orange)) shouldEqual 50
   }
 
   "The checkout system can add up arbitrary large lists correctly" in {
@@ -48,9 +48,14 @@ class CheckoutSpec extends WordSpec with Matchers with PropertyChecks{
         case _     ⇒ false
       }
 
+
       val numOranges = shoppingList.size - numApples
 
-      val total = (numApples * 60) + (numOranges * 25)
+      val adjustedNumApples: Int = Math.ceil(numApples / 2.0).toInt
+
+      val adjustedNumOranges: Int = (numOranges / 3 * 2) + (numOranges % 3)
+
+      val total = (adjustedNumApples * 60) + (adjustedNumOranges * 25)
 
       checkout.calculate(shoppingList) shouldEqual total
     }
@@ -59,7 +64,7 @@ class CheckoutSpec extends WordSpec with Matchers with PropertyChecks{
   "The checkout system can take a list of items " when {
     "the input is correctly formatted it outputs the cost in pence" in {
       val output = checkout.scan("Apple" :: "Apple" :: "Apple" :: "Orange" :: "Orange" :: Nil)
-      output shouldEqual Right(230)
+      output shouldEqual Right(170)
     }
     "the input is badly formatted it outputs an error" in {
       val output = checkout.scan("Oops" :: "Apple" :: "Apple" :: "Orange" :: "Orange" :: Nil)
